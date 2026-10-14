@@ -156,4 +156,5 @@ The prompt plays inside `<GetDigits>`, so you can press keys before it finishes.
 - **The dashboard says "No public URL".** `cloudflared` isn't installed or couldn't connect. Install it, or set `PUBLIC_URL`.
 - **"Plivo credentials: NOT WORKING".** The Auth ID or Auth Token in `.env` is wrong.
 - **The phone rings, you answer, and the call drops straight away.** Plivo couldn't load `/answer`. Check that the app is still running and look at the timeline for a rejected request.
+- **"Could not reach Plivo" when you press Call me.** Your internet connection dropped for a moment (for example a VPN reconnecting). Wait a few seconds and press it again. If the tunnel log shows `ERR` lines, the tunnel reconnects by itself; a stable network (or turning off a VPN) avoids it.
 - **Port 5050 is busy.** Set `PORT=5051` in `.env`. (Port 5000 is avoided on purpose: macOS uses it for AirPlay.)

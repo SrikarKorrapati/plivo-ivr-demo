@@ -116,13 +116,15 @@ def start_call():
         message = "Plivo rejected the Auth ID / Auth Token. Check them in .env."
     except plivo.exceptions.PlivoRestError as error:
         message = f"Plivo refused the call: {error}"
-    except Exception as error:  # network trouble, DNS, ...
-        message = f"Could not reach Plivo: {error}"
+    except Exception as error:  # no internet, DNS failure, timeout...
+        print(f"Plivo API request failed: {error!r}", flush=True)  # full details stay in the terminal
+        message = "Could not reach Plivo. Check your internet connection and click Call me again."
     else:
         timeline.add(f"Calling {to} from {config.PLIVO_NUMBER}", stage="calling",
                      call=response.request_uuid, endpoint="/api/call")
         return jsonify(ok=True, to=to, request_uuid=response.request_uuid)
 
+    message = message.replace(config.PLIVO_AUTH_ID, "<auth id>")  # never show the Auth ID on screen
     timeline.add(message, stage="calling", level="err", endpoint="/api/call")
     return jsonify(ok=False, error=message), 502
 

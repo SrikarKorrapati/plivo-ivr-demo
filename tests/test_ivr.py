@@ -421,3 +421,10 @@ def test_hangup_callback_tolerates_missing_or_odd_fields(client):
     texts = [e["text"] for e in timeline.since(0)][-4:]
     assert texts[2] == "Call ended after 42s (Normal Hangup)"
     assert texts[3] == "Call was not answered (NO_ANSWER)"
+
+
+def test_error_messages_never_show_the_auth_id(client):
+    FakePlivo.error = plivo.exceptions.ResourceNotFoundError(
+        "Resource at /v1/Account/MATESTAUTHID00000000/Call/ could not be found")
+    response = client.post("/api/call", json={"to": "+919876543210"})
+    assert "MATESTAUTHID00000000" not in response.get_json()["error"]
