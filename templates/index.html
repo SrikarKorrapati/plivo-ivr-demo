@@ -61,16 +61,6 @@
     }
     h1 { font-size: 22px; margin: 0; }
     header p { margin: 0; color: var(--muted); font-size: 14px; }
-    .pills { display: flex; flex-wrap: wrap; gap: 8px; }
-    .pill {
-      display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 999px;
-      font-size: 13px; font-weight: 600; border: 1px solid var(--border); background: var(--card);
-      max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-    }
-    .pill::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--muted); flex: none; }
-    .pill.ok::before { background: var(--ok); }
-    .pill.err { color: var(--err); }
-    .pill.err::before { background: var(--err); }
 
     main {
       max-width: 1180px; margin: 0 auto; padding: 12px 16px 40px;
@@ -112,19 +102,6 @@
     .status.ok { background: var(--ok-soft); color: var(--ok); }
     .status.err { background: var(--err-soft); color: var(--err); }
 
-    .guide { margin: 0; padding: 0; list-style: none; display: grid; gap: 12px; }
-    .guide li { display: grid; grid-template-columns: 34px 1fr; gap: 10px; align-items: start; }
-    .guide .num {
-      width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center;
-      background: var(--accent-soft); color: var(--accent); font-weight: 800;
-    }
-    .guide b { display: block; }
-    .guide span.sub { color: var(--muted); font-size: 14px; }
-    kbd {
-      display: inline-block; min-width: 22px; padding: 0 6px; border-radius: 6px; text-align: center;
-      border: 1px solid var(--border); border-bottom-width: 2px; background: var(--bg);
-      font: 600 13px/20px ui-monospace, SFMono-Regular, Menlo, monospace;
-    }
 
     .stepper {
       list-style: none; margin: 0 0 18px; padding: 0; display: flex; flex-wrap: wrap; gap: 8px;
@@ -193,12 +170,6 @@
         <p>Outbound call · OTP check · two-level menu, built on the Plivo Voice API</p>
       </div>
     </div>
-    <div class="pills">
-      <span class="pill {{ 'ok' if credentials_ok else 'err' }}">Plivo credentials</span>
-      <span class="pill {{ 'ok' if public_url else 'err' }}" title="{{ public_url or 'not set' }}">
-        {{ public_url or 'No public URL' }}
-      </span>
-    </div>
   </header>
 
   <main>
@@ -223,31 +194,10 @@
         <div id="call-status" class="status" role="status" aria-live="polite"></div>
       </section>
 
-      <section class="card">
-        <h2>2 · What to press</h2>
-        <ol class="guide">
-          <li>
-            <span class="num">1</span>
-            <div><b>Enter the 4-digit OTP</b>
-              <span class="sub">Your birthdate as DDMM. Try a wrong code first: the bot asks again.</span></div>
-          </li>
-          <li>
-            <span class="num">2</span>
-            <div><b>Level 1: Language</b>
-              <span class="sub"><kbd>1</kbd> English &nbsp; <kbd>2</kbd> Español</span></div>
-          </li>
-          <li>
-            <span class="num">3</span>
-            <div><b>Level 2: Menu</b>
-              <span class="sub"><kbd>1</kbd> Play an audio message &nbsp; <kbd>2</kbd> Talk to an associate &nbsp; <kbd>9</kbd> Change language</span></div>
-          </li>
-        </ol>
-        <p class="hint">Any other key (or silence) repeats the current question.</p>
-      </section>
     </div>
 
     <section class="card">
-      <h2>3 · Live call flow</h2>
+      <h2>2 · Live call flow</h2>
       <ol id="stepper" class="stepper">
         <li data-stage="calling">Calling</li>
         <li data-stage="ringing">Ringing</li>

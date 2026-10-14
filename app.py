@@ -50,8 +50,6 @@ def dashboard():
         "index.html",
         public_url=config.PUBLIC_URL,
         tunnel_error=state["tunnel_error"],
-        credentials_ok=state["credentials"] in (None, "OK") and bool(
-            config.PLIVO_AUTH_ID and config.PLIVO_AUTH_TOKEN),
         plivo_number=config.PLIVO_NUMBER,
         target_number=config.TARGET_NUMBER,
     )

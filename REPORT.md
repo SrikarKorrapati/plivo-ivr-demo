@@ -94,6 +94,8 @@ One CI job failed during development, and it was a bug in the CI script, not in 
 
 **The real setup.** With the real tunnel and credentials, the app confirmed the credentials with Plivo at startup, and Plivo-facing pages were reachable through the public URL (`/health` 200, the MP3 200 with `audio/mpeg`). The dashboard, the call API and unsigned webhooks were refused from the internet (403).
 
+**A real call.** On 14 October 2026 we placed a real call from the dashboard to an Indian mobile: the phone rang after 3 seconds, the caller was greeted, entered the OTP and was verified, chose English, picked "talk to an associate", and was forwarded to the associate number. When the associate call ended, the call closed normally after 60 seconds ("Normal Hangup"). Every request Plivo sent during the call passed the `X-Plivo-Signature-V3` check (no rejections). That confirms the signature handling behind the tunnel works with real Plivo traffic, not just in tests.
+
 ## 5. Known limits
 
 - The app uses Flask's built-in server and keeps the timeline in memory. That's right for a demo; in production it would run under a WSGI server such as gunicorn and log to a proper store.
