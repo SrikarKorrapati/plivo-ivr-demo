@@ -17,7 +17,7 @@ While the call is running, the dashboard shows a live timeline of each step, inc
 
 - Python 3.10 or newer
 - A Plivo account: your **Auth ID** and **Auth Token** (from the overview page of the Plivo console) and a voice-enabled Plivo number
-- `cloudflared`, so Plivo can reach the app running on your laptop: `brew install cloudflared` on macOS. If you'd rather use ngrok or a deployed server, that works too; see "Using your own public URL" below.
+- `cloudflared`, so Plivo can reach the app running on your laptop: `brew install cloudflared` on macOS, `winget install Cloudflare.cloudflared` on Windows, or the package from Cloudflare's downloads page on Linux. If you'd rather use ngrok or a deployed server, that works too; see "Using your own public URL" below.
 
 ## Setup
 
@@ -85,6 +85,8 @@ The automated tests use the same simulator to make complete calls: a wrong OTP a
 ```bash
 pytest -v
 ```
+
+For everything we checked (the Plivo research, every edge case, and the environments we ran it in), see [REPORT.md](REPORT.md).
 
 To test with a real phone, run the app and press **Call me**. A good run-through is: wrong OTP, correct OTP, Spanish, 1 for the audio message, then 2 for the associate.
 
