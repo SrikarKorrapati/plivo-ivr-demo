@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>InspireWorks IVR Demo</title>
+  <style>
+    :root {
+      --bg: #f4f5f9;
+      --card: #ffffff;
+      --text: #1b2232;
+      --muted: #667085;
+      --border: #e3e6ee;
+      --accent: #4f46e5;
+      --accent-hover: #4338ca;
+      --accent-soft: #eef0ff;
+      --ok: #079455;
+      --ok-soft: #e7f8ef;
+      --warn: #b54708;
+      --warn-soft: #fff6e5;
+      --err: #d92d20;
+      --err-soft: #fdeceb;
+      --code-bg: #0f172a;
+      --code-text: #dbe4f3;
+      --radius: 14px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0d1117;
+        --card: #161b24;
+        --text: #e6e9ef;
+        --muted: #98a2b3;
+        --border: #2a3140;
+        --accent: #7c74ff;
+        --accent-hover: #918bff;
+        --accent-soft: #232456;
+        --ok: #3ccb7f;
+        --ok-soft: #12301f;
+        --warn: #fdb022;
+        --warn-soft: #3a2a0c;
+        --err: #f97066;
+        --err-soft: #3d1715;
+        --code-bg: #0a0e15;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    header {
+      display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between;
+      max-width: 1180px; margin: 0 auto; padding: 22px 16px 6px;
+    }
+    .brand { display: flex; gap: 14px; align-items: center; }
+    .logo {
+      width: 46px; height: 46px; border-radius: 12px; display: grid; place-items: center;
+      background: var(--accent); color: #fff; font-weight: 800; letter-spacing: .5px;
+    }
+    h1 { font-size: 22px; margin: 0; }
+    header p { margin: 0; color: var(--muted); font-size: 14px; }
+    .pills { display: flex; flex-wrap: wrap; gap: 8px; }
+    .pill {
+      display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 999px;
+      font-size: 13px; font-weight: 600; border: 1px solid var(--border); background: var(--card);
+      max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .pill::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--muted); flex: none; }
+    .pill.ok::before { background: var(--ok); }
+    .pill.err { color: var(--err); }
+    .pill.err::before { background: var(--err); }
+
+    main {
+      max-width: 1180px; margin: 0 auto; padding: 12px 16px 40px;
+      display: grid; gap: 16px; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    }
+    .card {
+      background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 20px; min-width: 0;
+    }
+    .left { display: grid; gap: 16px; align-content: start; min-width: 0; }
+    h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 0 0 14px; }
+    .banner {
+      grid-column: 1 / -1; padding: 12px 16px; border-radius: var(--radius);
+      background: var(--err-soft); color: var(--err); border: 1px solid var(--err); font-size: 14px;
+    }
+    .banner code { font-size: 13px; }
+
+    label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+    .row { display: flex; gap: 10px; flex-wrap: wrap; }
+    input[type=tel] {
+      flex: 1 1 200px; min-width: 0; font-size: 18px; padding: 12px 14px; border-radius: 10px;
+      border: 1px solid var(--border); background: var(--bg); color: var(--text);
+    }
+    input[type=tel]:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+    button {
+      font: inherit; cursor: pointer; border-radius: 10px; border: 1px solid var(--border);
+      background: var(--card); color: var(--text); padding: 6px 12px;
+    }
+    button.primary {
+      flex: 0 0 auto; background: var(--accent); border-color: var(--accent); color: #fff;
+      font-size: 18px; font-weight: 700; padding: 12px 22px;
+    }
+    button.primary:hover { background: var(--accent-hover); }
+    button:disabled { opacity: .6; cursor: progress; }
+    .hint { color: var(--muted); font-size: 13px; margin: 8px 0 0; }
+    .status { margin-top: 14px; padding: 10px 14px; border-radius: 10px; font-size: 15px; display: none; }
+    .status.show { display: block; }
+    .status.info { background: var(--accent-soft); color: var(--accent); }
+    .status.ok { background: var(--ok-soft); color: var(--ok); }
+    .status.err { background: var(--err-soft); color: var(--err); }
+
+    .guide { margin: 0; padding: 0; list-style: none; display: grid; gap: 12px; }
+    .guide li { display: grid; grid-template-columns: 34px 1fr; gap: 10px; align-items: start; }
+    .guide .num {
+      width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center;
+      background: var(--accent-soft); color: var(--accent); font-weight: 800;
+    }
+    .guide b { display: block; }
+    .guide span.sub { color: var(--muted); font-size: 14px; }
+    kbd {
+      display: inline-block; min-width: 22px; padding: 0 6px; border-radius: 6px; text-align: center;
+      border: 1px solid var(--border); border-bottom-width: 2px; background: var(--bg);
+      font: 600 13px/20px ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
+    .stepper {
+      list-style: none; margin: 0 0 18px; padding: 0; display: flex; flex-wrap: wrap; gap: 8px;
+      counter-reset: step;
+    }
+    .stepper li {
+      counter-increment: step; display: flex; align-items: center; gap: 6px;
+      padding: 7px 12px; border-radius: 999px; font-size: 14px; font-weight: 600;
+      border: 1px solid var(--border); color: var(--muted); background: var(--bg);
+      transition: background .25s, color .25s, border-color .25s;
+    }
+    .stepper li::before { content: counter(step); font-size: 12px; opacity: .7; }
+    .stepper li.done { background: var(--ok-soft); color: var(--ok); border-color: transparent; }
+    .stepper li.done::before { content: "✓"; opacity: 1; }
+    .stepper li.active {
+      background: var(--accent); color: #fff; border-color: var(--accent);
+      animation: pulse 1.4s ease-in-out infinite;
+    }
+    .stepper li.failed { background: var(--err-soft); color: var(--err); border-color: transparent; }
+    @keyframes pulse { 50% { box-shadow: 0 0 0 6px var(--accent-soft); } }
+
+    .timeline-head {
+      display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+      border-top: 1px solid var(--border); padding-top: 14px; margin-bottom: 8px;
+    }
+    .timeline-head strong { margin-right: auto; }
+    .timeline-head label { display: inline-flex; gap: 6px; align-items: center; font-weight: 500; margin: 0; font-size: 14px; }
+    .timeline { list-style: none; margin: 0; padding: 0; max-height: 62vh; overflow-y: auto; }
+    .timeline:empty::after {
+      content: "No calls yet. Press “Call me” and the call steps will appear here as they happen.";
+      display: block; color: var(--muted); padding: 18px 0;
+    }
+    .event {
+      display: grid; grid-template-columns: 74px 14px minmax(0, 1fr); gap: 10px;
+      padding: 9px 0; border-bottom: 1px dashed var(--border); animation: fadein .3s ease;
+    }
+    @keyframes fadein { from { opacity: 0; transform: translateY(4px); } }
+    .event time { color: var(--muted); font: 13px/22px ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .dot { width: 12px; height: 12px; border-radius: 50%; margin-top: 5px; background: var(--muted); }
+    .event.ok .dot { background: var(--ok); }
+    .event.warn .dot { background: var(--warn); }
+    .event.err .dot { background: var(--err); }
+    .event.info .dot { background: var(--accent); }
+    .event .text { font-size: 15px; overflow-wrap: anywhere; }
+    .event .meta { color: var(--muted); font-size: 12px; }
+    .event details { margin-top: 6px; }
+    .event summary { cursor: pointer; color: var(--accent); font-size: 13px; font-weight: 600; }
+    pre {
+      margin: 6px 0 0; padding: 12px; border-radius: 10px; overflow-x: auto;
+      background: var(--code-bg); color: var(--code-text);
+      font: 12.5px/1.55 ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
+    @media (max-width: 860px) {
+      main { grid-template-columns: minmax(0, 1fr); }
+      .event { grid-template-columns: 64px 12px minmax(0, 1fr); gap: 8px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="logo">IW</div>
+      <div>
+        <h1>InspireWorks IVR Demo</h1>
+        <p>Outbound call · OTP check · two-level menu, built on the Plivo Voice API</p>
+      </div>
+    </div>
+    <div class="pills">
+      <span class="pill {{ 'ok' if credentials_ok else 'err' }}">Plivo credentials</span>
+      <span class="pill {{ 'ok' if public_url else 'err' }}" title="{{ public_url or 'not set' }}">
+        {{ public_url or 'No public URL' }}
+      </span>
+    </div>
+  </header>
+
+  <main>
+    {% if not public_url %}
+    <div class="banner">
+      <strong>Plivo can't reach this server yet.</strong>
+      {{ tunnel_error or "Set PUBLIC_URL in .env, or install cloudflared so the app can open a tunnel for you." }}
+    </div>
+    {% endif %}
+
+    <div class="left">
+      <section class="card">
+        <h2>1 · Start the call</h2>
+        <form id="call-form">
+          <label for="to">Phone number to call</label>
+          <div class="row">
+            <input id="to" name="to" type="tel" value="{{ target_number }}" placeholder="+91XXXXXXXXXX" autocomplete="tel" required>
+            <button id="call-btn" class="primary" type="submit">📞 Call me</button>
+          </div>
+          <p class="hint">The call comes from the Plivo number {{ plivo_number }}.</p>
+        </form>
+        <div id="call-status" class="status" role="status" aria-live="polite"></div>
+      </section>
+
+      <section class="card">
+        <h2>2 · What to press</h2>
+        <ol class="guide">
+          <li>
+            <span class="num">1</span>
+            <div><b>Enter the 4-digit OTP</b>
+              <span class="sub">Your birthdate as DDMM. Try a wrong code first: the bot asks again.</span></div>
+          </li>
+          <li>
+            <span class="num">2</span>
+            <div><b>Level 1: Language</b>
+              <span class="sub"><kbd>1</kbd> English &nbsp; <kbd>2</kbd> Español</span></div>
+          </li>
+          <li>
+            <span class="num">3</span>
+            <div><b>Level 2: Menu</b>
+              <span class="sub"><kbd>1</kbd> Play an audio message &nbsp; <kbd>2</kbd> Talk to an associate &nbsp; <kbd>9</kbd> Change language</span></div>
+          </li>
+        </ol>
+        <p class="hint">Any other key (or silence) repeats the current question.</p>
+      </section>
+    </div>
+
+    <section class="card">
+      <h2>3 · Live call flow</h2>
+      <ol id="stepper" class="stepper">
+        <li data-stage="calling">Calling</li>
+        <li data-stage="ringing">Ringing</li>
+        <li data-stage="answered">Answered</li>
+        <li data-stage="otp">OTP</li>
+        <li data-stage="language">Language</li>
+        <li data-stage="menu">Menu</li>
+        <li data-stage="action">Action</li>
+        <li data-stage="ended">Ended</li>
+      </ol>
+      <div class="timeline-head">
+        <strong>Timeline</strong>
+        <label><input type="checkbox" id="show-xml"> Show Plivo XML</label>
+        <button id="clear-btn" type="button">Clear</button>
+      </div>
+      <ul id="timeline" class="timeline"></ul>
+    </section>
+  </main>
+
+  <script>
+    const STAGES = ["calling", "ringing", "answered", "otp", "language", "menu", "action", "ended"];
+    const DEFAULT_LABELS = {};
+    document.querySelectorAll("#stepper li").forEach(li => DEFAULT_LABELS[li.dataset.stage] = li.textContent);
+
+    const form = document.getElementById("call-form");
+    const button = document.getElementById("call-btn");
+    const statusBox = document.getElementById("call-status");
+    const timeline = document.getElementById("timeline");
+    const showXml = document.getElementById("show-xml");
+    let lastId = 0;
+    let reached = new Set();
+
+    function setStatus(kind, text) {
+      statusBox.className = `status show ${kind}`;
+      statusBox.textContent = text;
+    }
+
+    // ---- 1. Start the call -------------------------------------------------
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      button.disabled = true;
+      setStatus("info", "Placing the call…");
+      try {
+        const res = await fetch("/api/call", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ to: document.getElementById("to").value }),
+        });
+        const data = await res.json();
+        if (data.ok) {
+          setStatus("ok", `Calling ${data.to}. Pick up your phone!`);
+        } else {
+          setStatus("err", data.error || "Could not place the call.");
+        }
+      } catch (err) {
+        setStatus("err", "Could not reach the server. Is app.py still running?");
+      } finally {
+        setTimeout(() => { button.disabled = false; }, 2500);
+      }
+    });
+
+    // ---- 3. Live call flow --------------------------------------------------
+    function resetStepper() {
+      reached = new Set();
+      document.querySelectorAll("#stepper li").forEach(li => {
+        li.className = "";
+        li.textContent = DEFAULT_LABELS[li.dataset.stage];
+      });
+    }
+
+    function updateStepper(ev) {
+      if (!ev.stage) return;
+      if (ev.stage === "calling") resetStepper();           // a new call starts a fresh flow
+      reached.add(ev.stage);
+      document.querySelectorAll("#stepper li").forEach(li => {
+        const stage = li.dataset.stage;
+        li.classList.remove("active", "failed");
+        if (reached.has(stage)) li.classList.add("done");
+        if (stage === ev.stage && stage !== "ended") {
+          li.classList.add(ev.level === "err" ? "failed" : "active");
+        }
+        if (stage === ev.stage && ev.step_label) li.textContent = ev.step_label;
+      });
+    }
+
+    function addEvent(ev) {
+      const li = document.createElement("li");
+      li.className = `event ${ev.level || "info"}`;
+
+      const time = document.createElement("time");
+      time.textContent = ev.time;
+      const dot = document.createElement("span");
+      dot.className = "dot";
+      const body = document.createElement("div");
+      const text = document.createElement("div");
+      text.className = "text";
+      text.textContent = ev.text;
+      body.appendChild(text);
+      if (ev.call) {
+        const meta = document.createElement("div");
+        meta.className = "meta";
+        meta.textContent = `call ${ev.call}${ev.endpoint ? " · " + ev.endpoint : ""}`;
+        body.appendChild(meta);
+      }
+      if (ev.xml) {
+        const details = document.createElement("details");
+        details.open = showXml.checked;
+        const summary = document.createElement("summary");
+        summary.textContent = "Plivo XML returned";
+        const pre = document.createElement("pre");
+        pre.textContent = ev.xml;
+        details.append(summary, pre);
+        body.appendChild(details);
+      }
+      li.append(time, dot, body);
+
+      const atBottom = timeline.scrollHeight - timeline.scrollTop - timeline.clientHeight < 40;
+      timeline.appendChild(li);
+      if (atBottom) timeline.scrollTop = timeline.scrollHeight;
+      updateStepper(ev);
+    }
+
+    async function poll() {
+      try {
+        const res = await fetch(`/api/events?after=${lastId}`);
+        if (res.ok) {
+          const data = await res.json();
+          for (const ev of data.events) {
+            lastId = ev.id;
+            addEvent(ev);
+          }
+        }
+      } catch (err) {
+        // Server restarting or offline: just try again on the next tick.
+      }
+      setTimeout(poll, 1000);
+    }
+
+    showXml.addEventListener("change", () => {
+      document.querySelectorAll(".event details").forEach(d => d.open = showXml.checked);
+    });
+    document.getElementById("clear-btn").addEventListener("click", () => {
+      timeline.innerHTML = "";
+      resetStepper();
+      statusBox.className = "status";
+    });
+
+    poll();
+  </script>
+</body>
+</html>

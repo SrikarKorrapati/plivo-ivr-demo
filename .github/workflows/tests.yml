@@ -1,0 +1,33 @@
+name: tests
+
+on: [push, pull_request, workflow_dispatch]
+
+jobs:
+  test:
+    name: ${{ matrix.os }} / Python ${{ matrix.python }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install
+        run: pip install -r requirements.txt
+      - name: Unit and full-call tests
+        run: pytest -v
+      - name: Smoke test (app starts and serves the dashboard with no credentials and no tunnel)
+        shell: bash
+        env:
+          PUBLIC_URL: https://example.invalid
+          PORT: "5099"
+        run: |
+          python app.py > server.log 2>&1 &
+          for i in $(seq 1 30); do curl -sf http://127.0.0.1:5099/health && break; sleep 1; done
+          curl -sf http://127.0.0.1:5099/ -o dashboard.html
+          grep -q "Call me" dashboard.html
+          cat server.log
